@@ -53,7 +53,7 @@ Install-Module ps2exe -Scope CurrentUser
 Invoke-PS2EXE .\File-Court.ps1 .\File-Court.exe -noConsole -STA -DPIAware -title "File Court" -description "Real files. Real facts. Questionable justice." -company "Ghost Series" -product "File Court" -version "1.0.0.0"
 ```
 
-GitHub Actions builds the Windows executable on pushes and publishes `File-Court.exe` as a GitHub Release when a version tag such as `v1.0.0` is pushed.
+GitHub Actions builds the Windows executable on every push to `main` and refreshes the downloadable `File-Court.exe` release asset. Pushing a version tag such as `v1.0.1` publishes a version-tagged release.
 
 ## Ghost Series
 
