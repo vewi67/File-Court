@@ -180,6 +180,93 @@ Part of the Ghost Series: small, intentionally odd programs built around one sim
 "@
 }
 
+
+function Get-GhostArtworkText {
+    $artPath = Join-Path $script:AppRoot 'assets\ghost-series-art.txt'
+    if (Test-Path -LiteralPath $artPath -PathType Leaf) {
+        try {
+            $artText = Get-Content -LiteralPath $artPath -Raw -Encoding UTF8
+            if (-not [string]::IsNullOrWhiteSpace($artText)) {
+                return $artText.TrimEnd()
+            }
+        } catch {
+            # Continue to the built-in fallback if the asset cannot be read.
+        }
+    }
+
+    return @'
+              .-""""-.
+             / .--.   \
+            / /    \   \
+            | |    |   |
+            \ \    /   /
+             '.__.'__/
+             /      \
+            / /|  |\ \
+           /_/ |__| \_\
+              GHOST
+
+GHOST SERIES PRESENTS:
+FILE COURT
+'@
+}
+
+function Show-GhostSplash {
+    $splash = New-Object System.Windows.Forms.Form
+    $splash.Text = 'Ghost Series Presents | File Court'
+    $splash.StartPosition = 'CenterScreen'
+    $splash.Size = [System.Drawing.Size]::new(940, 850)
+    $splash.MinimumSize = [System.Drawing.Size]::new(780, 700)
+    $splash.FormBorderStyle = 'FixedDialog'
+    $splash.MaximizeBox = $false
+    $splash.MinimizeBox = $false
+    $splash.BackColor = $script:C.Background
+    $splash.ForeColor = $script:C.Text
+    $splash.Font = New-Object System.Drawing.Font('Segoe UI', 9)
+    $splash.AutoScaleMode = [System.Windows.Forms.AutoScaleMode]::Dpi
+
+    $heading = New-Object System.Windows.Forms.Label
+    $heading.Text = 'GHOST SERIES PRESENTS'
+    $heading.Location = [System.Drawing.Point]::new(20, 12)
+    $heading.Size = [System.Drawing.Size]::new(880, 30)
+    $heading.Font = New-Object System.Drawing.Font('Segoe UI', 14, [System.Drawing.FontStyle]::Bold)
+    $heading.ForeColor = $script:C.Accent
+    $heading.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
+    $splash.Controls.Add($heading)
+
+    $artBox = New-Object System.Windows.Forms.RichTextBox
+    $artBox.Location = [System.Drawing.Point]::new(18, 50)
+    $artBox.Size = [System.Drawing.Size]::new(888, 670)
+    $artBox.ReadOnly = $true
+    $artBox.WordWrap = $false
+    $artBox.DetectUrls = $false
+    $artBox.BackColor = [System.Drawing.Color]::FromArgb(9, 12, 18)
+    $artBox.ForeColor = $script:C.Accent
+    $artBox.BorderStyle = 'FixedSingle'
+    $artBox.Font = New-Object System.Drawing.Font('Consolas', 8.25)
+    $artBox.Text = Get-GhostArtworkText
+    $splash.Controls.Add($artBox)
+
+    $enterButton = New-Object System.Windows.Forms.Button
+    $enterButton.Text = 'ENTER THE COURT'
+    $enterButton.Location = [System.Drawing.Point]::new(355, 738)
+    $enterButton.Size = [System.Drawing.Size]::new(210, 42)
+    $enterButton.FlatStyle = 'Flat'
+    $enterButton.FlatAppearance.BorderSize = 0
+    $enterButton.BackColor = $script:C.Accent
+    $enterButton.ForeColor = [System.Drawing.Color]::FromArgb(12, 28, 30)
+    $enterButton.Font = New-Object System.Drawing.Font('Segoe UI', 10, [System.Drawing.FontStyle]::Bold)
+    $enterButton.Cursor = [System.Windows.Forms.Cursors]::Hand
+    $enterButton.Add_Click({ $splash.Close() })
+    $splash.AcceptButton = $enterButton
+    $splash.Controls.Add($enterButton)
+
+    [void]$splash.ShowDialog()
+    $splash.Dispose()
+}
+
+Show-GhostSplash
+
 $form = New-Object System.Windows.Forms.Form
 $form.Text = 'File Court'
 $form.StartPosition = 'CenterScreen'
@@ -424,26 +511,7 @@ $aboutButton.Add_Click({
 })
 
 $ghostArtButton.Add_Click({
-    $artPath = Join-Path $script:AppRoot 'assets\ghost-series-art.txt'
-    $artText = $null
-    if (Test-Path -LiteralPath $artPath -PathType Leaf) {
-        try {
-            $artText = Get-Content -LiteralPath $artPath -Raw -Encoding UTF8
-        } catch {
-            $artText = $null
-        }
-    }
-
-    if ([string]::IsNullOrWhiteSpace($artText)) {
-        $artText = @'
-GHOST SERIES ART NOT FOUND
-
-Place the official ghost artwork here:
-assets\ghost-series-art.txt
-
-When building File Court.exe, the artwork is embedded into the executable.
-'@
-    }
+    $artText = Get-GhostArtworkText
 
     $artForm = New-Object System.Windows.Forms.Form
     $artForm.Text = 'Ghost Series Artwork | File Court'
