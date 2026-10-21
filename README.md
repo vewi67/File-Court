@@ -1,68 +1,110 @@
 # File Court ⚖️
 
+**Ghost Series · Program 0111 · Release 1.0.0**
+
+[![Build File Court](https://github.com/vewi67/File-Court/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/vewi67/File-Court/actions/workflows/build.yml)
+
 > **[⬇️ DOWNLOAD FILE COURT FOR WINDOWS](https://github.com/vewi67/File-Court/releases/latest/download/File-Court.exe)**
 
 **Real files. Real facts. Questionable justice.**
 
-File Court is a Windows desktop app that examines real file metadata and puts the file on trial for completely unserious reasons. It reports the actual file size, extension, timestamps, attributes, and optional SHA-256 hash, then delivers a theatrical verdict and a cautious recommendation.
+File Court is a small Windows desktop app that puts your files on trial. It checks real filesystem metadata, guesses what a file type is commonly used for, and delivers a cautious **Keep or Review** recommendation with a completely unserious courtroom verdict.
 
-## What it does
+It is designed to help you think about your files, not to make deletion decisions for you.
 
-1. Select a real file from your PC.
-2. Read its filesystem metadata, including exact byte size and modification time.
-3. See what the file type is commonly used for, based on its extension.
-4. Get a **Keep or Review** recommendation based on metadata, location, age, attributes, and size.
-5. Receive a joke verdict based on the file's actual properties and location.
-6. Optionally calculate its SHA-256 hash.
-7. Copy the case record or export it as a plain-text report.
-8. Open the file's location in File Explorer.
-9. Open **View Ghost Art** to display the Ghost Series ASCII artwork.
+## What File Court does
 
-## The court's rules
+- **Examines real metadata:** file name, location, extension, exact size, timestamps, and Windows attributes.
+- **Explains possible purpose:** describes the common use of a file type, such as a document, image, installer, archive, script, or library.
+- **Gives a keep-or-review recommendation:** considers clues such as file location, age, size, extension, and attributes.
+- **Delivers a verdict:** dramatic courtroom language based on the file's real metadata.
+- **Calculates SHA-256 on demand:** produces a file fingerprint you can use for comparison.
+- **Creates a case report:** copy the report to your clipboard or export it as a plain-text file.
+- **Finds the file:** open File Explorer with the selected file highlighted.
+- **Shows the Ghost Series artwork:** enjoy the ASCII ghost presentation and the in-app artwork viewer.
 
-- **File Court never deletes, moves, renames, edits, or executes the selected file.**
-- It does not upload files or send their contents anywhere.
-- It is not an antivirus and does not determine whether a file is malicious.
-- A verdict such as “POTENTIAL CLUTTER” is a joke and a prompt to review the file, not proof that it is safe to delete.
-- The **Possible Purpose** description is inferred from the file extension. It is a common use, not a guarantee of what the file contains.
-- The **Keep or Review** suggestion is cautious guidance based on metadata and location. File Court cannot know whether a personal file is important to you.
-- Files in Windows or application-support locations receive extra caution.
-- Size, extension, timestamps, and attributes come from Windows. Timestamps can be changed by software or users.
-- SHA-256 is a fingerprint, not a safety rating.
+## How to use it
 
-## Download
+1. Download **[File-Court.exe](https://github.com/vewi67/File-Court/releases/latest/download/File-Court.exe)** from the official GitHub Release.
+2. Open File Court and choose a file to put on trial.
+3. Read **Possible Purpose**, **Keep or Review?**, the verdict, and the case report.
+4. Optionally calculate its SHA-256 fingerprint, copy the report, or export it.
+5. Make your own decision. The court's robe is imaginary; your files are not.
 
-Download **[File-Court.exe from the latest GitHub Release](https://github.com/vewi67/File-Court/releases/latest/download/File-Court.exe)**. Windows may show its normal warning for an app downloaded from the internet. Only run software you trust.
+## Understand the verdict
 
-## Ghost Series artwork
+File Court deliberately separates **what Windows reports** from **what the app infers**.
 
-The artwork lives at **[`assets/ghost-series-art.txt`](assets/ghost-series-art.txt)**. Replace the contents of that file with the official Ghost Series artwork you want File Court to display. Keep the filename and path unchanged. The Windows build embeds this asset into `File-Court.exe`, so the artwork travels with the executable.
+| Report section | What it means |
+| --- | --- |
+| **File facts** | Values read from Windows, such as file size, extension, timestamps, and attributes. |
+| **Possible Purpose** | A general description inferred mainly from the extension. It is not a content inspection or a guarantee. |
+| **Keep or Review?** | A cautious suggestion based on available metadata and location, not a definitive decision. |
+| **Courtroom verdict** | The humorous part. Take the joke seriously only as a joke. |
+| **SHA-256** | An optional fingerprint for comparing files, not a malware scan or safety rating. |
 
-When running the PowerShell script directly, keep the same `assets/ghost-series-art.txt` path next to the script.
+An old file is not automatically useless. A large file is not automatically disposable. A temporary-looking file may still be in use, and a personal photo or document can be valuable even when its metadata looks unremarkable.
+
+**File Court will not delete, move, rename, edit, or execute your selected file.**
+
+## Privacy and safety
+
+- File analysis is performed locally on your PC.
+- File Court does not upload your selected files or send their contents to a remote service.
+- Choosing **Calculate SHA-256** makes the app read the selected file to calculate its fingerprint.
+- File Court is not an antivirus, does not certify that a file is safe, and cannot determine how important a file is to you.
+- Use judgment before removing anything. Keep backups of files that matter.
+
+Windows may display a security or reputation warning for a downloaded executable. Only run software obtained from a source you trust. The official download is linked at the top of this page.
+
+## Requirements
+
+- Windows
+- Windows PowerShell 5.1 for running the source script directly
+- No separate Python, Node.js, or third-party runtime is required to run the released executable
 
 ## Run from source
 
-The application logic is **100% PowerShell** and targets Windows PowerShell 5.1. It uses built-in Windows Forms libraries. No Python, Node.js, external API, or third-party runtime is required to run the compiled app.
+Download or clone this repository, keep the artwork file in its expected location, then run the script from Windows PowerShell:
 
 ```powershell
 .\File-Court.ps1
 ```
 
-## Build the EXE yourself
+The artwork file must remain at `assets\ghost-series-art.txt` when running the script directly.
 
-The EXE is produced from the PowerShell source using the open-source PS2EXE module.
+## Build the executable
+
+The project is written in PowerShell and uses [PS2EXE](https://github.com/MScholtes/PS2EXE) to package the desktop app as a Windows executable.
+
+From Windows PowerShell, in the project folder, run:
 
 ```powershell
-Install-Module ps2exe -Scope CurrentUser
-Invoke-PS2EXE .\File-Court.ps1 .\File-Court.exe -noConsole -STA -DPIAware -title "File Court" -description "Real files. Real facts. Questionable justice." -company "Ghost Series" -product "File Court" -version "1.0.0.0"
+.\build.ps1
 ```
 
-GitHub Actions builds the Windows executable on every push to `main` and refreshes the downloadable `File-Court.exe` release asset. Pushing a version tag such as `v1.0.1` publishes a version-tagged release.
+The build script checks for the source and artwork files, installs PS2EXE for the current user if needed, and produces:
+
+```text
+dist\File-Court.exe
+```
+
+An internet connection is needed the first time the build script installs PS2EXE. GitHub Actions also builds the app and refreshes the downloadable release asset when changes are pushed to `main`. Version tags such as `v1.0.1` can be used to publish a versioned release.
+
+## Project files
+
+```text
+File-Court.ps1                 Main PowerShell application
+build.ps1                      Local Windows build script
+assets/ghost-series-art.txt    Ghost Series ASCII artwork
+.github/workflows/build.yml    Automated build and release workflow
+LICENSE                        Ghost Series Custom License 1.0
+```
 
 ## Ghost Series
 
-File Court is the **fourth program in the Ghost Series**, a collection of small, intentionally odd programs built around one simple idea taken to an absurd extreme. File Court applies a completely unserious courtroom to real file metadata.
+File Court is the **fourth program in the Ghost Series**: small, intentionally odd programs built around one simple idea taken to an absurd extreme. This time, the idea is a courtroom for ordinary files.
 
 ## License
 
-Distributed under the **Ghost Series Custom License 1.0**. Read [LICENSE](LICENSE) before redistributing or modifying this project. This custom license is not an OSI-approved open-source license.
+File Court is distributed under the **Ghost Series Custom License 1.0**, included in [LICENSE](LICENSE). It permits personal, educational, and other non-commercial use under stated conditions. Commercial use and redistribution require prior written permission. This is a custom license, not an OSI-approved open-source license.
