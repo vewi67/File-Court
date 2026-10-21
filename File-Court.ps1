@@ -14,6 +14,17 @@ Add-Type -AssemblyName System.Drawing
 $script:CurrentItem = $null
 $script:CurrentRuling = $null
 $script:CurrentHash = $null
+
+# In a normal script this is PSScriptRoot. PS2EXE exposes ScriptRoot for compiled apps.
+$script:AppRoot = $null
+$compiledRoot = Get-Variable -Name ScriptRoot -ErrorAction SilentlyContinue
+if ($compiledRoot -and -not [string]::IsNullOrWhiteSpace([string]$compiledRoot.Value)) {
+    $script:AppRoot = [string]$compiledRoot.Value
+} elseif (-not [string]::IsNullOrWhiteSpace($PSScriptRoot)) {
+    $script:AppRoot = $PSScriptRoot
+} else {
+    $script:AppRoot = [AppDomain]::CurrentDomain.BaseDirectory
+}
 $script:C = @{
     Background = [System.Drawing.Color]::FromArgb(15,18,26)
     Panel = [System.Drawing.Color]::FromArgb(23,29,41)
@@ -313,6 +324,7 @@ $copyButton = New-ActionButton -Text 'COPY CASE REPORT' -Width 155
 $exportButton = New-ActionButton -Text 'EXPORT REPORT...' -Width 145
 $folderButton = New-ActionButton -Text 'SHOW IN EXPLORER' -Width 155
 $aboutButton = New-ActionButton -Text 'ABOUT' -Width 100
+$ghostArtButton = New-ActionButton -Text 'VIEW GHOST ART' -Width 145
 
 function Update-Report { $reportBox.Text = Get-CaseReport }
 
@@ -409,6 +421,73 @@ $aboutButton.Add_Click({
         'This app reads metadata and makes jokes. It is not an antivirus. It never deletes, moves, edits, renames, or executes files.' +
         [Environment]::NewLine + [Environment]::NewLine + 'Built entirely in PowerShell for Windows.'
     [void][System.Windows.Forms.MessageBox]::Show($msg,'About File Court','OK','Information')
+})
+
+$ghostArtButton.Add_Click({
+    $artPath = Join-Path $script:AppRoot 'assets\ghost-series-art.txt'
+    $artText = $null
+    if (Test-Path -LiteralPath $artPath -PathType Leaf) {
+        try {
+            $artText = Get-Content -LiteralPath $artPath -Raw -Encoding UTF8
+        } catch {
+            $artText = $null
+        }
+    }
+
+    if ([string]::IsNullOrWhiteSpace($artText)) {
+        $artText = @'
+GHOST SERIES ART NOT FOUND
+
+Place the official ghost artwork here:
+assets\ghost-series-art.txt
+
+When building File Court.exe, the artwork is embedded into the executable.
+'@
+    }
+
+    $artForm = New-Object System.Windows.Forms.Form
+    $artForm.Text = 'Ghost Series Artwork | File Court'
+    $artForm.StartPosition = 'CenterParent'
+    $artForm.Size = [System.Drawing.Size]::new(850, 700)
+    $artForm.MinimumSize = [System.Drawing.Size]::new(600, 450)
+    $artForm.BackColor = $script:C.Background
+    $artForm.ForeColor = $script:C.Text
+    $artForm.Font = New-Object System.Drawing.Font('Segoe UI', 9)
+    $artForm.AutoScaleMode = [System.Windows.Forms.AutoScaleMode]::Dpi
+
+    $artHeading = New-Object System.Windows.Forms.Label
+    $artHeading.Text = 'OFFICIAL GHOST SERIES ARTWORK'
+    $artHeading.Dock = 'Top'
+    $artHeading.Height = 38
+    $artHeading.TextAlign = [System.Drawing.ContentAlignment]::MiddleLeft
+    $artHeading.Padding = [System.Windows.Forms.Padding]::new(14, 0, 0, 0)
+    $artHeading.ForeColor = $script:C.Accent
+    $artHeading.Font = New-Object System.Drawing.Font('Segoe UI', 11, [System.Drawing.FontStyle]::Bold)
+    $artForm.Controls.Add($artHeading)
+
+    $artBox = New-Object System.Windows.Forms.RichTextBox
+    $artBox.Dock = 'Fill'
+    $artBox.ReadOnly = $true
+    $artBox.WordWrap = $false
+    $artBox.DetectUrls = $false
+    $artBox.BackColor = [System.Drawing.Color]::FromArgb(10, 13, 18)
+    $artBox.ForeColor = $script:C.Accent
+    $artBox.BorderStyle = 'FixedSingle'
+    $artBox.Font = New-Object System.Drawing.Font('Consolas', 8.25)
+    $artBox.Text = $artText.TrimEnd()
+    $artForm.Controls.Add($artBox)
+
+    $artFooter = New-Object System.Windows.Forms.Label
+    $artFooter.Text = 'Ghost Series #0111  |  assets\ghost-series-art.txt'
+    $artFooter.Dock = 'Bottom'
+    $artFooter.Height = 27
+    $artFooter.TextAlign = [System.Drawing.ContentAlignment]::MiddleLeft
+    $artFooter.Padding = [System.Windows.Forms.Padding]::new(12, 0, 0, 0)
+    $artFooter.ForeColor = $script:C.Muted
+    $artForm.Controls.Add($artFooter)
+
+    [void]$artForm.ShowDialog($form)
+    $artForm.Dispose()
 })
 
 $form.Add_Shown({ $form.Activate() })
