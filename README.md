@@ -10,11 +10,13 @@ File Court is a Windows desktop app that examines real file metadata and puts th
 
 1. Select a real file from your PC.
 2. Read its filesystem metadata, including exact byte size and modification time.
-3. Receive a joke verdict based on the file's actual properties and location.
-4. Optionally calculate its SHA-256 hash.
-5. Copy the case record or export it as a plain-text report.
-6. Open the file's location in File Explorer.
-7. Open **View Ghost Art** to display the Ghost Series ASCII artwork.
+3. See what the file type is commonly used for, based on its extension.
+4. Get a **Keep or Review** recommendation based on metadata, location, age, attributes, and size.
+5. Receive a joke verdict based on the file's actual properties and location.
+6. Optionally calculate its SHA-256 hash.
+7. Copy the case record or export it as a plain-text report.
+8. Open the file's location in File Explorer.
+9. Open **View Ghost Art** to display the Ghost Series ASCII artwork.
 
 ## The court's rules
 
@@ -22,6 +24,8 @@ File Court is a Windows desktop app that examines real file metadata and puts th
 - It does not upload files or send their contents anywhere.
 - It is not an antivirus and does not determine whether a file is malicious.
 - A verdict such as “POTENTIAL CLUTTER” is a joke and a prompt to review the file, not proof that it is safe to delete.
+- The **Possible Purpose** description is inferred from the file extension. It is a common use, not a guarantee of what the file contains.
+- The **Keep or Review** suggestion is cautious guidance based on metadata and location. File Court cannot know whether a personal file is important to you.
 - Files in Windows or application-support locations receive extra caution.
 - Size, extension, timestamps, and attributes come from Windows. Timestamps can be changed by software or users.
 - SHA-256 is a fingerprint, not a safety rating.
