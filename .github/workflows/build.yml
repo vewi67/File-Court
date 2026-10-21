@@ -1,0 +1,62 @@
+name: Build File Court
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install PS2EXE and build the Windows app
+        shell: powershell
+        run: |
+          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          Install-Module -Name ps2exe -Scope CurrentUser -Force
+          New-Item -ItemType Directory -Path dist -Force | Out-Null
+          Invoke-PS2EXE -inputFile .\File-Court.ps1 -outputFile .\dist\File-Court.exe -noConsole -STA -DPIAware -title "File Court" -description "Real files. Real facts. Questionable justice." -company "Ghost Series" -product "File Court" -version "1.0.0.0"
+          if (-not (Test-Path .\dist\File-Court.exe)) { throw 'The executable was not created.' }
+
+      - name: Upload Windows executable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: File-Court-Windows
+          path: dist/File-Court.exe
+          if-no-files-found: error
+          retention-days: 14
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download built executable
+        uses: actions/download-artifact@v4
+        with:
+          name: File-Court-Windows
+          path: dist
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: File Court ${{ github.ref_name }}
+          body: |
+            File Court is the fourth program in the Ghost Series.
+
+            **Real files. Real facts. Questionable justice.**
+
+            Download `File-Court.exe` below. The app reads real file metadata, makes jokes, and never deletes or modifies files.
+          files: dist/File-Court.exe
+          fail_on_unmatched_files: true
