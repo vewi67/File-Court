@@ -23,8 +23,11 @@ jobs:
         run: |
           Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
           Install-Module -Name ps2exe -Scope CurrentUser -Force
+          if (-not (Test-Path .\assets\ghost-series-art.txt)) { throw 'Ghost Series artwork asset is missing.' }
           New-Item -ItemType Directory -Path dist -Force | Out-Null
-          Invoke-PS2EXE -inputFile .\File-Court.ps1 -outputFile .\dist\File-Court.exe -noConsole -STA -DPIAware -title "File Court" -description "Real files. Real facts. Questionable justice." -company "Ghost Series" -product "File Court" -version "1.0.0.0"
+          $artPath = (Resolve-Path .\assets\ghost-series-art.txt).Path
+          $embeddedFiles = @{ '.\assets\ghost-series-art.txt' = $artPath }
+          Invoke-PS2EXE -inputFile .\File-Court.ps1 -outputFile .\dist\File-Court.exe -noConsole -STA -DPIAware -embedFiles $embeddedFiles -title "File Court" -description "Real files. Real facts. Questionable justice." -company "Ghost Series" -product "File Court" -version "1.0.0.0"
           if (-not (Test-Path .\dist\File-Court.exe)) { throw 'The executable was not created.' }
 
       - name: Upload Windows executable artifact
