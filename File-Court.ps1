@@ -58,6 +58,68 @@ function Test-UnderRoot {
     } catch { return $false }
 }
 
+
+function Get-FilePurpose {
+    param([System.IO.FileInfo]$Item)
+
+    $ext = $Item.Extension.ToLowerInvariant()
+
+    $purpose = Get-FilePurpose -Item $Item
+    if ($isProtected -or $isSystemAttribute) {
+        $keepDecision = 'KEEP IT'
+        $keepReason = 'It appears to be in a Windows/application-support area or is marked as a system file. Removing it could break software.'
+    } elseif ($isTemp -and $ageDays -ge 7) {
+        $keepDecision = 'REVIEW FIRST'
+        $keepReason = 'It looks temporary or cached and is old, but an application may still rely on it. Confirm its owner and status before cleanup.'
+    } elseif ($isDownload -and ($archiveExts -contains $ext) -and $ageDays -ge 90) {
+        $keepDecision = 'CHECK IF STILL NEEDED'
+        $keepReason = 'It may be an old installer, disk image, or archive. Keep it if it is your only copy or you still need it.'
+    } elseif ($Item.Length -ge 1GB) {
+        $keepDecision = 'REVIEW FOR SPACE'
+        $keepReason = 'A large file may be worth reviewing when storage is low, but size alone does not make it disposable.'
+    } elseif ($ageDays -ge 365) {
+        $keepDecision = 'KEEP OR ARCHIVE'
+        $keepReason = 'It has not been modified for a long time. Old files can still be valuable, so identify it and back up anything important.'
+    } elseif ($isReadOnly) {
+        $keepDecision = 'KEEP FOR NOW'
+        $keepReason = 'Read-only is just a file attribute, not evidence that the file is useless or safe to remove.'
+    } else {
+        $keepDecision = 'KEEP FOR NOW'
+        $keepReason = 'The available metadata does not provide a good reason to remove it. Keep it unless you know what it is and no longer need it.'
+    }
+
+    switch ($ext) {
+        { $_ -in @('.txt','.md','.rtf') } { return 'Usually stores written notes, instructions, documentation, or readable text.' }
+        { $_ -in @('.doc','.docx','.odt') } { return 'Usually a word-processing document, such as a letter, schoolwork, or report.' }
+        '.pdf' { return 'Usually a document such as a manual, form, receipt, book, or report.' }
+        { $_ -in @('.jpg','.jpeg','.png','.gif','.bmp','.webp','.heic','.tif','.tiff') } { return 'Usually an image or photo; it may be worth keeping as a personal memory or resource.' }
+        { $_ -in @('.mp4','.mov','.mkv','.avi','.wmv','.webm') } { return 'Usually a video recording, clip, movie, or screen capture.' }
+        { $_ -in @('.mp3','.wav','.flac','.aac','.ogg','.m4a') } { return 'Usually audio, such as music, a recording, a voice note, or sound effects.' }
+        { $_ -in @('.zip','.7z','.rar','.tar','.gz') } { return 'An archive that can bundle other files together, often for storage or sharing.' }
+        '.iso' { return 'A disk-image copy, often used to install an operating system or load a virtual machine.' }
+        '.exe' { return 'A Windows program or launcher. Its exact job depends on the application; do not run unknown files.' }
+        '.msi' { return 'Usually a Windows software installer used to install or configure an application.' }
+        { $_ -in @('.dll','.ocx') } { return 'Usually a code library used by another Windows program, not a document to open directly.' }
+        { $_ -in @('.sys','.drv') } { return 'Usually a Windows driver or low-level system component. Do not remove it casually.' }
+        { $_ -in @('.ps1','.bat','.cmd') } { return 'A script that can automate commands or tasks. Review its contents before running it.' }
+        { $_ -in @('.py','.js','.ts','.cs','.cpp','.c','.java','.go','.rs','.php') } { return 'Source code used to build or run software; it may belong to a project or a learning exercise.' }
+        { $_ -in @('.html','.htm','.css','.scss') } { return 'Usually part of a website or web interface: page structure, styling, or related resources.' }
+        { $_ -in @('.xlsx','.xls','.ods','.csv') } { return 'Usually a spreadsheet or tabular dataset, such as a budget, list, or exported data.' }
+        { $_ -in @('.ppt','.pptx','.odp') } { return 'Usually a presentation made of slides for explaining or showing information.' }
+        { $_ -in @('.json','.xml','.yaml','.yml','.toml','.ini','.cfg','.conf') } { return 'Usually structured data or configuration read by an app, tool, or project.' }
+        { $_ -in @('.db','.sqlite','.sqlite3') } { return 'Usually a database that stores organized information for an app or project.' }
+        '.log' { return 'A log of events or diagnostic messages, often useful when troubleshooting a program.' }
+        { $_ -in @('.tmp','.temp','.cache') } { return 'Usually temporary or cached data. It may be safe to clear in some cases, but an app could still need it.' }
+        { $_ -in @('.bak','.old') } { return 'Often a backup or older version that could help recover something. Check what it belongs to first.' }
+        default {
+            if ([string]::IsNullOrWhiteSpace($ext)) {
+                return 'There is no file extension to identify its usual role. Check the name, origin, and contents.'
+            }
+            return "The extension '$ext' does not reveal a reliable purpose. Check which app created it and inspect its contents safely."
+        }
+    }
+}
+
 function Get-CourtRuling {
     param([System.IO.FileInfo]$Item)
     $ageDays = [int][Math]::Floor(((Get-Date) - $Item.LastWriteTime).TotalDays)
@@ -133,7 +195,7 @@ function Get-CourtRuling {
         '.log' { $joke = 'This file has been keeping records. The court would like to know who authorized it to take notes.' }
         default { $joke = 'The filename is suspiciously confident for something that cannot defend itself.' }
     }
-    return [pscustomobject]@{ Verdict=$verdict; Priority=$priority; Reason=$reason; Advice=$advice; Joke=$joke; Tone=$tone; AgeDays=$ageDays; AgeText=$ageText }
+    return [pscustomobject]@{ Verdict=$verdict; Priority=$priority; Reason=$reason; Advice=$advice; Joke=$joke; Tone=$tone; AgeDays=$ageDays; AgeText=$ageText; Purpose=$purpose; KeepDecision=$keepDecision; KeepReason=$keepReason }
 }
 
 function Get-CaseReport {
@@ -159,6 +221,15 @@ Last modified: $($item.LastWriteTime.ToString('yyyy-MM-dd HH:mm:ss'))
 Age since modification: $($ruling.AgeText)
 Attributes: $($item.Attributes)
 SHA-256: $hashText
+
+POSSIBLE PURPOSE
+----------------
+$($ruling.Purpose)
+
+KEEP OR REVIEW?
+---------------
+$($ruling.KeepDecision)
+$($ruling.KeepReason)
 
 WHY THE COURT RULED THIS WAY
 ----------------------------
@@ -340,7 +411,7 @@ $verdictPanel.Controls.Add($priorityLabel)
 
 $detailsPanel = New-Object System.Windows.Forms.Panel
 $detailsPanel.Location = [System.Drawing.Point]::new(25,312)
-$detailsPanel.Size = [System.Drawing.Size]::new(975,124)
+$detailsPanel.Size = [System.Drawing.Size]::new(975,160)
 $detailsPanel.Anchor = 'Top,Left,Right'; $detailsPanel.BackColor = $script:C.Panel
 $form.Controls.Add($detailsPanel)
 
@@ -368,17 +439,52 @@ Add-Detail -Caption 'FILE TYPE' -X 260 -Y 14 -Width 180 -Key 'Type'
 Add-Detail -Caption 'LAST MODIFIED' -X 485 -Y 14 -Width 220 -Key 'Modified'
 Add-Detail -Caption 'DAYS SINCE MODIFIED' -X 735 -Y 14 -Width 220 -Key 'Age'
 
+$purposeCaption = New-Object System.Windows.Forms.Label
+$purposeCaption.Text = 'POSSIBLE PURPOSE'
+$purposeCaption.Location = [System.Drawing.Point]::new(18,78)
+$purposeCaption.Size = [System.Drawing.Size]::new(570,17)
+$purposeCaption.Font = New-Object System.Drawing.Font('Segoe UI',8,[System.Drawing.FontStyle]::Bold)
+$purposeCaption.ForeColor = $script:C.Muted
+$detailsPanel.Controls.Add($purposeCaption)
+
+$purposeValue = New-Object System.Windows.Forms.Label
+$purposeValue.Text = 'Select a file to see what this type is commonly used for.'
+$purposeValue.Location = [System.Drawing.Point]::new(18,97)
+$purposeValue.Size = [System.Drawing.Size]::new(570,48)
+$purposeValue.Font = New-Object System.Drawing.Font('Segoe UI',9)
+$purposeValue.ForeColor = $script:C.Text
+$purposeValue.AutoEllipsis = $true
+$detailsPanel.Controls.Add($purposeValue)
+
+$keepCaption = New-Object System.Windows.Forms.Label
+$keepCaption.Text = 'KEEP OR REVIEW?'
+$keepCaption.Location = [System.Drawing.Point]::new(620,78)
+$keepCaption.Size = [System.Drawing.Size]::new(335,17)
+$keepCaption.Font = New-Object System.Drawing.Font('Segoe UI',8,[System.Drawing.FontStyle]::Bold)
+$keepCaption.ForeColor = $script:C.Muted
+$detailsPanel.Controls.Add($keepCaption)
+
+$keepValue = New-Object System.Windows.Forms.Label
+$keepValue.Text = 'AWAITING EVIDENCE'
+$keepValue.Location = [System.Drawing.Point]::new(620,97)
+$keepValue.Size = [System.Drawing.Size]::new(335,42)
+$keepValue.Font = New-Object System.Drawing.Font('Segoe UI',10,[System.Drawing.FontStyle]::Bold)
+$keepValue.ForeColor = $script:C.Muted
+$keepValue.AutoEllipsis = $true
+$detailsPanel.Controls.Add($keepValue)
+
+
 $caseTitle = New-Object System.Windows.Forms.Label
 $caseTitle.Text = 'THE COURT RECORD'
-$caseTitle.Location = [System.Drawing.Point]::new(25,450)
+$caseTitle.Location = [System.Drawing.Point]::new(25,488)
 $caseTitle.Size = [System.Drawing.Size]::new(400,24)
 $caseTitle.Font = New-Object System.Drawing.Font('Segoe UI',10,[System.Drawing.FontStyle]::Bold)
 $caseTitle.ForeColor = $script:C.Accent
 $form.Controls.Add($caseTitle)
 
 $reportBox = New-Object System.Windows.Forms.RichTextBox
-$reportBox.Location = [System.Drawing.Point]::new(25,480)
-$reportBox.Size = [System.Drawing.Size]::new(975,155)
+$reportBox.Location = [System.Drawing.Point]::new(25,518)
+$reportBox.Size = [System.Drawing.Size]::new(975,126)
 $reportBox.Anchor = 'Top,Bottom,Left,Right'
 $reportBox.ReadOnly = $true; $reportBox.BackColor = $script:C.Panel
 $reportBox.ForeColor = $script:C.Text; $reportBox.BorderStyle = 'FixedSingle'
@@ -435,6 +541,9 @@ function Analyze-SelectedFile {
         $script:DetailLabels['Type'].Text = if ($item.Extension) { $item.Extension.ToUpperInvariant() } else { 'NO EXTENSION' }
         $script:DetailLabels['Modified'].Text = $item.LastWriteTime.ToString('yyyy-MM-dd HH:mm')
         $script:DetailLabels['Age'].Text = "$($script:CurrentRuling.AgeDays) days"
+        $purposeValue.Text = $script:CurrentRuling.Purpose
+        $keepValue.Text = $script:CurrentRuling.KeepDecision
+        $keepValue.ForeColor = $script:C[$script:CurrentRuling.Tone]
         Update-Report
     } catch {
         [void][System.Windows.Forms.MessageBox]::Show(('The clerk could not examine this file:' + [Environment]::NewLine + $_.Exception.Message),'File Court - Clerk Error','OK','Error')
