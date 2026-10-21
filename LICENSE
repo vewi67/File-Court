@@ -2,26 +2,48 @@ GHOST SERIES CUSTOM LICENSE
 Version 1.0
 Copyright (c) 2026 Ghost Series contributors
 
-1. PERMISSION
+This license applies to the File Court project files distributed with this notice, including the source code, documentation, and Ghost Series artwork, unless a file contains a separate license notice.
 
-Permission is granted to any person obtaining a copy of this software and its accompanying files to use, run, copy, share, and modify the software for personal, educational, and non-commercial purposes.
+1. GRANTED PERMISSIONS
 
-2. ATTRIBUTION
+You may use, run, study, copy, and modify the project for personal, educational, and other non-commercial purposes.
 
-Redistributions of the original software or modified versions must retain this license and the copyright notice. If you share a modified version, you must clearly indicate that you changed it and must not imply that your version is an official release of the Ghost Series.
+These permissions are conditional on following all terms below. No permission is granted for commercial use, commercial redistribution, or sale except with prior written permission from the Ghost Series maintainers.
 
-3. RESTRICTIONS
+2. SHARING AND MODIFICATIONS
 
-You may not claim the original work as your own, remove attribution when redistributing it, or use the Ghost Series name or branding to falsely suggest endorsement or official status.
+You may share unmodified copies or non-commercial modified versions, provided that you:
 
-Commercial redistribution or sale of this software, or of a modified version, requires prior written permission from the Ghost Series maintainers.
+- Include this license and retain the existing copyright and attribution notices.
+- Clearly identify modified versions as modified.
+- Do not claim the original work as your own.
+- Do not imply that a modified version is an official Ghost Series release or that the Ghost Series maintainers endorse it.
 
-4. NO WARRANTY
+3. RESTRICTIONS AND BRANDING
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM THE SOFTWARE OR ITS USE.
+You may not remove attribution when redistributing the project, sell the project or a modified version, or use the Ghost Series name, logo, artwork, or other branding to falsely suggest official status or endorsement.
 
-5. ACCEPTANCE
+Use of the project name solely to identify an unmodified copy or to describe a compatible or modified version does not imply endorsement and must not be presented as official affiliation.
 
-By using, copying, modifying, or redistributing this software, you agree to the terms of this license.
+Commercial use, commercial distribution, bundling for sale, or other commercial exploitation requires prior written permission from the Ghost Series maintainers.
 
-This custom license is not a standard OSI-approved open-source license. If you need a standard open-source license, consider using a recognized license such as MIT or Apache-2.0.
+4. THIRD-PARTY SOFTWARE
+
+Tools and third-party components used to build, package, or run the project may be governed by their own licenses. This license does not replace or override those separate terms.
+
+5. NO WARRANTY
+
+THE SOFTWARE AND PROJECT MATERIALS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE AUTHORS, CONTRIBUTORS, AND COPYRIGHT HOLDERS SHALL NOT BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE, THE PROJECT MATERIALS, OR THEIR USE.
+
+6. ACCEPTANCE
+
+By exercising the permissions granted by this license, you agree to comply with its terms. If you do not agree, you may not use, copy, modify, or redistribute the project under this license.
+
+7. LICENSE STATUS
+
+This is a custom, non-commercial license. It is not an OSI-approved open-source license and does not grant the same permissions as licenses such as MIT or Apache-2.0. Do not assume that commercial or unrestricted open-source use is permitted.
+
+For permission requests, contact the Ghost Series maintainers through the official project repository:
+https://github.com/vewi67/File-Court
