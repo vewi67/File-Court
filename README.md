@@ -14,6 +14,7 @@ File Court is a Windows desktop app that examines real file metadata and puts th
 4. Optionally calculate its SHA-256 hash.
 5. Copy the case record or export it as a plain-text report.
 6. Open the file's location in File Explorer.
+7. Open **View Ghost Art** to display the Ghost Series ASCII artwork.
 
 ## The court's rules
 
@@ -28,6 +29,12 @@ File Court is a Windows desktop app that examines real file metadata and puts th
 ## Download
 
 Download **[File-Court.exe from the latest GitHub Release](https://github.com/vewi67/File-Court/releases/latest/download/File-Court.exe)**. Windows may show its normal warning for an app downloaded from the internet. Only run software you trust.
+
+## Ghost Series artwork
+
+The artwork lives at **[`assets/ghost-series-art.txt`](assets/ghost-series-art.txt)**. Replace the contents of that file with the official Ghost Series artwork you want File Court to display. Keep the filename and path unchanged. The Windows build embeds this asset into `File-Court.exe`, so the artwork travels with the executable.
+
+When running the PowerShell script directly, keep the same `assets/ghost-series-art.txt` path next to the script.
 
 ## Run from source
 
